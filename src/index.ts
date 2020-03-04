@@ -1,6 +1,5 @@
 import * as planets from './planets.json'
 import * as Three from 'three'
-import { Vector3 } from 'three'
 const scene = new Three.Scene()
 const camera = new Three.PerspectiveCamera(
   75,
@@ -10,16 +9,23 @@ const camera = new Three.PerspectiveCamera(
 )
 const renderer = new Three.WebGLRenderer()
 const lightSource = new Three.SpotLight(0xffffff)
-lightSource.position.set(0, 0, 0)
+lightSource.position.set(1000, 500, 500)
 lightSource.castShadow = true
 scene.add(lightSource)
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
-camera.position.x = 3
-camera.position.y = 3
-camera.position.z = 5
-console.log(planets)
+const axes = new Three.AxesHelper(1000);
+scene.add(axes)
+camera.position.x = 0
+camera.position.y = 0
+camera.position.z = 800
+
 camera.lookAt(0, 0, 0)
+
+const PI = Math.PI
+const sin = Math.sin
+const cos = Math.cos
+const arctan = Math.atan
 
 class Star {
   name: string
@@ -27,15 +33,16 @@ class Star {
   color: string
   constructor(name, radius, color) {
     this.name = name
-    this.radius = radius / 1000
+    this.radius = radius
     this.color = color
   }
   draw() {
-    const geometry = new Three.SphereGeometry(this.radius / 10000, 32, 32)
-    const material = new Three.MeshBasicMaterial({ color: this.color })
+    const geometry = new Three.SphereGeometry(this.radius, 32, 32)
+    const material = new Three.MeshLambertMaterial({ color: this.color })
     const sphere = new Three.Mesh(geometry, material)
     sphere.name = this.name
     scene.add(sphere)
+    console.log(sphere)
   }
 }
 
@@ -47,30 +54,40 @@ class Planet {
   aphelion: number //远日点km
   synodicPeriod: number //会合周期day
   obitalPeriod: number //公转周期day
+  sphere: any // 球体的threejs对象
   constructor(option) {
     this.name = option.name
-    this.radius = option.radius / 1000
+    this.radius = option.radius
     this.color = option.color
-    this.perihelion = option.perihelion / 1000
-    this.aphelion = option.aphelion / 1000
-    this.synodicPeriod = option.synodicPeriod / 1000
-    this.obitalPeriod = option.obitalPeriod / 1000
+    this.perihelion = option.perihelion
+    this.aphelion = option.aphelion
+    this.synodicPeriod = option.synodicPeriod
+    this.obitalPeriod = option.obitalPeriod
   }
   draw() {
-    // 修改行星参数使行星相比太阳大到可见
-    let ratio = 10
-    const geometry = new Three.SphereGeometry(this.radius * ratio, 26, 26)
-    const material = new Three.MeshBasicMaterial({ color: this.color })
-    const sphere = new Three.Mesh(geometry, material)
-    sphere.position.set((this.perihelion + this.aphelion) / 2, 0, 0)
-    sphere.name = this.name
-    console.log(sphere)
-    scene.add(sphere)
+    const geometry = new Three.SphereGeometry(this.radius, 26, 26)
+    const material = new Three.MeshLambertMaterial({ color: this.color })
+    this.sphere = new Three.Mesh(geometry, material)
+    this.sphere.position.set((this.perihelion + this.aphelion) / 2, 0, 0)
+    this.sphere.name = this.name
+    console.log(this.sphere)
+    scene.add(this.sphere)
   }
-  revolve() {}
+  revolve() {
+    const v = 2
+    const p = this.sphere.position
+    const theta = arctan(p.y / p.x)
+    if(p.x>=0){
+      this.sphere.position.x += v * sin(theta)
+      this.sphere.position.y -= v * cos(theta)
+    }else{
+      this.sphere.position.x += v * sin(-theta)
+      this.sphere.position.y += v * cos(theta)
+    }
+  }
 }
 
-const Sun = new Star('Sun', 695.7e3, 'red')
+const Sun = new Star('Sun', 80, 'red')
 const Mercury = new Planet(planets.fake.Mercury)
 const Venus = new Planet(planets.fake.Venus)
 const Earth = new Planet(planets.fake.Earth)
@@ -83,6 +100,15 @@ const Neptune = new Planet(planets.fake.Neptune)
 function render() {
   Sun.draw()
   Earth.draw()
+  Jupiter.draw()
   renderer.render(scene, camera)
 }
+function animate() {
+  Earth.revolve()
+  Jupiter.revolve()
+  renderer.render(scene, camera)
+  // console.log(Earth.sphere.position.x)
+  requestAnimationFrame(animate)
+}
 render()
+animate()
