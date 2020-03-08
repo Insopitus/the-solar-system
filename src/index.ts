@@ -1,24 +1,19 @@
 import * as planets from './planets.json'
 import * as Three from 'three'
 const scene = new Three.Scene()
-const camera = new Three.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-)
+const camera = new Three.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 )
 const renderer = new Three.WebGLRenderer()
-const lightSource = new Three.SpotLight(0xffffff)
-lightSource.position.set(1000, 500, 500)
+const lightSource = new Three.DirectionalLight(0xffffff)
+lightSource.position.set(0, 0, 500)
 lightSource.castShadow = true
 scene.add(lightSource)
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 const axes = new Three.AxesHelper(1000);
-scene.add(axes)
+// scene.add(axes)
 camera.position.x = 0
 camera.position.y = 0
-camera.position.z = 800
+camera.position.z = 1000
 
 camera.lookAt(0, 0, 0)
 
@@ -65,12 +60,11 @@ class Planet {
     this.obitalPeriod = option.obitalPeriod
   }
   draw() {
-    const geometry = new Three.SphereGeometry(this.radius, 26, 26)
+    const geometry = new Three.SphereGeometry(this.radius, 32, 32)
     const material = new Three.MeshLambertMaterial({ color: this.color })
     this.sphere = new Three.Mesh(geometry, material)
     this.sphere.position.set((this.perihelion + this.aphelion) / 2, 0, 0)
     this.sphere.name = this.name
-    console.log(this.sphere)
     scene.add(this.sphere)
   }
   revolve() {
@@ -99,14 +93,29 @@ const Neptune = new Planet(planets.fake.Neptune)
 
 function render() {
   Sun.draw()
+  Mercury.draw()
+  Venus.draw()
   Earth.draw()
+  Mars.draw()
   Jupiter.draw()
+  Saturn.draw()
+  Uranus.draw()
+  Neptune.draw()
+
   renderer.render(scene, camera)
 }
 function animate() {
+  Mercury.revolve()
+  Venus.revolve()
   Earth.revolve()
+  Mars.revolve()
   Jupiter.revolve()
+  Saturn.revolve()
+  Uranus.revolve()
+  Neptune.revolve()
+
   renderer.render(scene, camera)
+
   // console.log(Earth.sphere.position.x)
   requestAnimationFrame(animate)
 }
