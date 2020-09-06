@@ -75,7 +75,9 @@
     }
   },
   "fake": {
-    "Sun": {},
+    "Sun": {
+      "texture":"2k_sun"
+    },
     "Mercury": {
       "name": "Mercury",
       "radius": 2.4,
@@ -83,7 +85,8 @@
       "perihelion": 100,
       "aphelion": 100,
       "synodicPeriod": 115.88,
-      "obitalPeriod": 87.9691
+      "obitalPeriod": 87.9691,
+      "texture":"2k_mercury"
     },
     "Venus": {
       "name": "Venus",
@@ -92,7 +95,8 @@
       "perihelion": 200,
       "aphelion": 200,
       "synodicPeriod": 583.92,
-      "obitalPeriod": 224.701
+      "obitalPeriod": 224.701,
+      "texture":"2k_venus_surface"
     },
     "Earth": {
       "name": "Earth",
@@ -101,7 +105,8 @@
       "perihelion": 300,
       "aphelion": 300,
       "synodicPeriod": 365.26,
-      "obitalPeriod": 365.26
+      "obitalPeriod": 365.26,
+      "texture":"2k_earth"
     },
     "Mars": {
       "name": "Mars",
@@ -110,7 +115,8 @@
       "perihelion": 400,
       "aphelion": 400,
       "synodicPeriod": 779,
-      "obitalPeriod": 686
+      "obitalPeriod": 686,
+      "texture":"2k_mars"
     },
     "Jupiter": {
       "name": "Jupiter",
@@ -119,7 +125,8 @@
       "perihelion": 500,
       "aphelion": 500,
       "synodicPeriod": 398,
-      "obitalPeriod": 4332
+      "obitalPeriod": 4332,
+      "texture":"2k_jupiter"
     },
     "Saturn": {
       "name": "Saturn",
@@ -128,7 +135,8 @@
       "perihelion": 600,
       "aphelion": 600,
       "synodicPeriod": 378,
-      "obitalPeriod": 10759
+      "obitalPeriod": 10759,
+      "texture":"2k_saturn"
     },
     "Uranus": {
       "name": "Uranus",
@@ -137,7 +145,8 @@
       "perihelion": 700,
       "aphelion": 700,
       "synodicPeriod": 369,
-      "obitalPeriod": 30688
+      "obitalPeriod": 30688,
+      "texture":"2k_uranus"
     },
     "Neptune": {
       "name": "Neptune",
@@ -146,7 +155,8 @@
       "perihelion": 800,
       "aphelion": 800,
       "synodicPeriod": 367,
-      "obitalPeriod": 60182
+      "obitalPeriod": 60182,
+      "texture":"2k_neptune"
     }
   }
 }

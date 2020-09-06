@@ -1,8 +1,8 @@
 # The Solar System
- trying to build the solar system w/ three.js
+ Playing w/ three.js to build a simple model of the solar system.
 
-It's just a rough model of the sun and the 8 planets atm.
-I may add satellites to it in the future.
+Just a rough model of the sun and the 8 planets atm.
+More satellites might be added in the future.
 
 All the planets' data are from [Wikipedia](https://en.wikipedia.org/wiki/Solar_System)
 
@@ -11,3 +11,6 @@ I just found out that if I use the real ratios of the planets and the distances 
 
 ## How to build
 If you want build it youself, just run `npm install`, then `npm run build`
+
+## Thanks
+Thanks for [solarsystemscope.com](https://www.solarsystemscope.com/) for providing the textures.
