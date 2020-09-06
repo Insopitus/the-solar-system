@@ -1,19 +1,23 @@
+
+import { AxesHelper, DirectionalLight, Mesh, MeshLambertMaterial, OrthographicCamera, Scene, SphereGeometry, SpotLight, WebGLRenderer, AmbientLight, PerspectiveCamera, Object3D, Vector3, PointLight, Spherical, ArcCurve, Geometry, LineBasicMaterial, Line } from 'three'
+import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as planets from './planets.json'
-import * as Three from 'three'
-const scene = new Three.Scene()
-const camera = new Three.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 )
-const renderer = new Three.WebGLRenderer()
-const lightSource = new Three.DirectionalLight(0xffffff)
-lightSource.position.set(0, 0, 500)
-lightSource.castShadow = true
-scene.add(lightSource)
+const scene = new Scene()
+console.log(scene)
+const camera = new PerspectiveCamera(45,window.innerWidth /window.innerHeight, 1,20000)
+const renderer = new WebGLRenderer()
+const ambientlight = new AmbientLight(0xa0a0a0)
+const pointlight = new PointLight(0xffffff)
+
+
+const control = new MapControls(camera, renderer.domElement)
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
-const axes = new Three.AxesHelper(1000);
-// scene.add(axes)
+const axes = new AxesHelper(1000);
+scene.add(ambientlight,pointlight)
 camera.position.x = 0
-camera.position.y = 0
-camera.position.z = 1000
+camera.position.z = 0
+camera.position.y = 3000
 
 camera.lookAt(0, 0, 0)
 
@@ -32,16 +36,17 @@ class Star {
     this.color = color
   }
   draw() {
-    const geometry = new Three.SphereGeometry(this.radius, 32, 32)
-    const material = new Three.MeshLambertMaterial({ color: this.color })
-    const sphere = new Three.Mesh(geometry, material)
+    const geometry = new SphereGeometry(this.radius, 32, 32)
+    const material = new MeshLambertMaterial({ color: this.color })
+    const sphere = new Mesh(geometry, material)
     sphere.name = this.name
     scene.add(sphere)
     console.log(sphere)
   }
 }
 
-class Planet {
+
+interface PlanetInterface{
   name: string
   radius: number //半径km
   color: string
@@ -49,8 +54,21 @@ class Planet {
   aphelion: number //远日点km
   synodicPeriod: number //会合周期day
   obitalPeriod: number //公转周期day
-  sphere: any // 球体的threejs对象
-  constructor(option) {
+}
+class Planet  {
+  name: string
+  radius: number //半径km
+  color: string
+  perihelion: number //近日点km
+  aphelion: number //远日点km
+  synodicPeriod: number //会合周期day
+  obitalPeriod: number //公转周期day
+  sphere: Mesh // 球体的threejs对象
+  sphericalPosition :Spherical
+  #deltaTheta:number //每帧旋转弧度
+  #startTheta:number //起始旋转弧度，随机值
+  #track //轨道
+  constructor(option:PlanetInterface) {
     this.name = option.name
     this.radius = option.radius
     this.color = option.color
@@ -58,26 +76,33 @@ class Planet {
     this.aphelion = option.aphelion
     this.synodicPeriod = option.synodicPeriod
     this.obitalPeriod = option.obitalPeriod
+
+    this.sphericalPosition = new Spherical((this.perihelion+this.aphelion)/2,Math.PI/2,Math.random()*Math.PI*2)
+    this.#deltaTheta = 5/this.obitalPeriod
   }
   draw() {
-    const geometry = new Three.SphereGeometry(this.radius, 32, 32)
-    const material = new Three.MeshLambertMaterial({ color: this.color })
-    this.sphere = new Three.Mesh(geometry, material)
-    this.sphere.position.set((this.perihelion + this.aphelion) / 2, 0, 0)
+    const geometry = new SphereGeometry(this.radius, 32, 32)
+    const material = new MeshLambertMaterial({ color: this.color })
+    const trackCurve = new ArcCurve(0,0,(this.perihelion+this.aphelion)/2,0,Math.PI*2,true)
+    const trackGeometry = new Geometry().setFromPoints(trackCurve.getPoints(64))
+    const trackMaterial = new LineBasicMaterial({color:'gray'})
+    const track = new Line(trackGeometry,trackMaterial)
+    track.rotateX(Math.PI/2)
+    this.#track = track
+    this.sphere = new Mesh(geometry, material)
+    this.sphere.castShadow = true
+    this.sphere.position.setFromSpherical(this.sphericalPosition)
     this.sphere.name = this.name
-    scene.add(this.sphere)
+    scene.add(this.sphere,track)
   }
   revolve() {
     const v = 2
-    const p = this.sphere.position
-    const theta = arctan(p.y / p.x)
-    if(p.x>=0){
-      this.sphere.position.x += v * sin(theta)
-      this.sphere.position.y -= v * cos(theta)
-    }else{
-      this.sphere.position.x += v * sin(-theta)
-      this.sphere.position.y += v * cos(theta)
-    }
+    this.sphericalPosition.theta += this.#deltaTheta
+    this.sphere.position.setFromSpherical(this.sphericalPosition)
+  }
+  center() {
+    const position = this.sphere.position
+    camera.lookAt(position)
   }
 }
 
@@ -113,6 +138,8 @@ function animate() {
   Saturn.revolve()
   Uranus.revolve()
   Neptune.revolve()
+
+  // Earth.center()
 
   renderer.render(scene, camera)
 
